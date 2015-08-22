@@ -1,36 +1,38 @@
 package android.freifunker.opensource.seewes.freifunkerfinder;
 
 import android.app.Activity;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.freifunker.opensource.seewes.freifunkerfinder.map.GoogleMapFragment;
+import android.freifunker.opensource.seewes.freifunkerfinder.map.GoogleMapFragment.OnMarkerSelectedListener;
+import android.freifunker.opensource.seewes.freifunkerfinder.map.MapBaseFragment;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.Gravity;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+
+import com.google.android.gms.maps.model.Marker;
 
 
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, OnMarkerSelectedListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
+    public MapBaseFragment fragment;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,10 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        this.fragment = new GoogleMapFragment(this);
+        this.fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
     }
 
     @Override
@@ -52,8 +58,10 @@ public class MainActivity extends ActionBarActivity
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.content_frame, PlaceholderFragment.newInstance(position + 1))
                 .commit();
+
+
     }
 
     public void onSectionAttached(int number) {
@@ -105,6 +113,17 @@ public class MainActivity extends ActionBarActivity
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    @Override
+    public void onMarkerSelected(Marker marker, Boolean selected) {
+        String[] snippet = null;
+        if(marker!=null){
+            snippet = marker.getSnippet().split("%");
+        }
+        //onMarkerSelected(snippet, selected);
+    }
+
 
     /**
      * A placeholder fragment containing a simple view.
