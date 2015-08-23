@@ -44,6 +44,8 @@ public class GoogleMapFragment extends MapBaseFragment{
     private NodeCollection nodes;
     private MapContent mapcontent;
 
+    private String LOG = "FFFinder";
+
     public GoogleMapFragment(){
 
     }
@@ -56,7 +58,7 @@ public class GoogleMapFragment extends MapBaseFragment{
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        this.map = ((SupportMapFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+        this.map = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMap();
         if(init==false)initMap();
         //map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51, 11), 15.0f));
 
@@ -75,7 +77,7 @@ public class GoogleMapFragment extends MapBaseFragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //View view = super.onCreateView(inflater, container, savedInstanceState);
+        //view = super.onCreateView(inflater, container, savedInstanceState);
         if (view != null) {
             ViewGroup parent = (ViewGroup) view.getParent();
             if (parent != null)
@@ -85,6 +87,7 @@ public class GoogleMapFragment extends MapBaseFragment{
             view = inflater.inflate(R.layout.fragment_map_google, container, false);
         } catch (InflateException e) {
 	        /* map is already there, just return view as it is */
+            e.printStackTrace();
         }
 
         RelativeLayout relLay = (RelativeLayout) inflater.inflate(R.layout.fragment_map_google_container, null);
