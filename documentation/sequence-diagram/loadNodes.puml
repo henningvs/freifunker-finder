@@ -1,0 +1,32 @@
+@startuml
+
+participant MV as "MapView"
+participant B4FF as "Backend4Freifunk"
+participant NH as "Node\nHasher"
+participant FFB as "Freifunk Map\nBackend"
+
+
+MV -> B4FF: getNodes({GeoHash})
+activate MV
+
+    loop "foreach GeoHash"
+        B4FF -> NH: getNodes(GeoHash)
+        activate B4FF
+        activate NH
+
+            NH -> FFB: getNodes(BoundingBox)
+            activate FFB
+            FFB -> NH: Return: {Node}
+            deactivate FFB
+
+        NH --> B4FF: Return: NodeCollection
+        deactivate NH
+    end
+
+    B4FF -> B4FF: mergeNodeCollections()
+
+    B4FF -> MV: Return: {NodeCollection}
+
+    deactivate B4FF
+deactivate MV
+@enduml
