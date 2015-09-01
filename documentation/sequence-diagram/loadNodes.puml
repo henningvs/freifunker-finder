@@ -1,32 +1,77 @@
 @startuml
 
-participant MV as "MapView"
+participant MV as "Android\nMap View"
 participant B4FF as "Backend4Freifunk"
 participant NH as "Node\nHasher"
 participant FFB as "Freifunk Map\nBackend"
 
+group onMapViewCreation
 
-MV -> B4FF: getNodes({GeoHash})
-activate MV
+    [-> MV: Event: \nMapCreation
+    activate MV
+    MV -> MV: getVisibleBoundingBox(screen)
 
-    loop "foreach GeoHash"
-        B4FF -> NH: getNodes(GeoHash)
-        activate B4FF
-        activate NH
+    MV -> MV: calculateGeoHashes(BoundingBox)
 
-            NH -> FFB: getNodes(BoundingBox)
-            activate FFB
-            FFB -> NH: Return: {Node}
-            deactivate FFB
 
-        NH --> B4FF: Return: NodeCollection
-        deactivate NH
-    end
+    MV -> B4FF: getNodes({GeoHash})
 
-    B4FF -> B4FF: mergeNodeCollections()
+        loop "foreach GeoHash"
+            B4FF -> NH: getNodes(GeoHash)
+            activate B4FF
+            activate NH
 
-    B4FF -> MV: Return: {NodeCollection}
+                NH -> FFB: getNodes(BoundingBox)
+                activate FFB
+                FFB --> NH: Return: {Node}
+                deactivate FFB
 
-    deactivate B4FF
-deactivate MV
+            NH --> B4FF: Return: NodeCollection
+            deactivate NH
+        end
+
+        B4FF -> B4FF: mergeNodeCollections()
+
+        B4FF --> MV: Return: {NodeCollection}
+
+        deactivate B4FF
+    deactivate MV
+
+end
+
+group onMapViewChange
+
+    [-> MV: Event: \nMapChanged
+    activate MV
+    MV -> MV: getVisibleBoundingBox(screen)
+
+    MV -> MV: calculateGeoHashes(BoundingBox)
+
+    MV -> MV: substractDownloadedGeoHashes({GeoHash})
+
+    MV -> B4FF: getNodes({GeoHash})
+
+        loop "foreach GeoHash"
+            B4FF -> NH: getNodes(GeoHash)
+            activate B4FF
+            activate NH
+
+                NH -> FFB: getNodes(BoundingBox)
+                activate FFB
+                FFB --> NH: Return: {Node}
+                deactivate FFB
+
+            NH --> B4FF: Return: NodeCollection
+            deactivate NH
+        end
+
+        B4FF -> B4FF: mergeNodeCollections()
+
+        B4FF --> MV: Return: {NodeCollection}
+
+        deactivate B4FF
+    deactivate MV
+
+end
+
 @enduml
